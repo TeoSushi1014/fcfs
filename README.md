@@ -1,103 +1,77 @@
-# FCFS Scheduling Algorithm - Bài Tập Nhóm
+## 1) Tóm tắt (8–10 dòng)
 
-## Giới thiệu
-Repository này chứa implementation của thuật toán First-Come-First-Served (FCFS) scheduling cho môn Hệ Điều Hành.
+* Mục tiêu: cài đặt và đánh giá **FCFS non-preemptive**; minh họa **convoy effect**. FCFS phục vụ theo **thứ tự đến** (FIFO). ([GeeksforGeeks][1])
+* Chỉ số dùng: **CT, TAT, WT, Response**. Công thức bắt buộc phải ghi:
+  TAT = CT − AT, WT = TAT − BT, Response = thời điểm chạy lần đầu − AT. ([Baeldung on Kotlin][2])
+* Kết quả chính (điền số của bạn): dataset “normal” có Avg TAT, WT thấp; dataset “convoy” tăng mạnh WT do job dài đứng đầu → đúng **convoy effect**. ([GeeksforGeeks][3])
 
-## Cấu trúc Project
-```
-fcfs/
-├── fcfs.py          # Implementation chính của thuật toán FCFS
-├── test.py          # File test cases
-├── theory.docx      # Tài liệu lý thuyết
-└── README.md        # File này
-```
+> Mẫu câu:
+> “Chúng tôi hiện thực FCFS (không tiền ngắt), đo CT, TAT, WT, Response trên hai workload nhỏ. Kết quả cho thấy ở kịch bản có tiến trình dài, thời gian chờ trung bình tăng rõ rệt, phù hợp mô tả convoy effect.”
 
-## Hướng dẫn cho thành viên nhóm
+---
 
-### 1. Clone Repository lần đầu
-```powershell
-git clone https://github.com/TeoSushi1014/fcfs.git
-cd fcfs
-```
+## 2) Giới thiệu (bối cảnh 0.5–1 trang)
 
-### 2. Quy trình làm việc hàng ngày
+* Vì sao cần định thời CPU, vai trò của FCFS trong nhóm thuật toán nền. Nhấn mạnh: **đơn giản, công bằng theo thứ tự đến, nhưng phản hồi kém** khi có job dài. ([cs341.cs.illinois.edu][4])
+* Mục tiêu báo cáo: cài đặt, minh họa, so sánh nhanh với RR, SJF/SRTF.
 
-#### Trước khi bắt đầu làm việc
-**LUÔN** pull code mới nhất để tránh xung đột:
-```powershell
-git pull origin main
-```
+---
 
-#### Sau khi hoàn thành thay đổi
-```powershell
-# Xem file nào đã thay đổi
-git status
+## 3) Cơ sở lý thuyết (1 trang)
 
-# Thêm tất cả file đã thay đổi
-git add .
+* **FCFS (First-Come First-Served)**: hàng đợi FIFO, **non-preemptive**, dễ gặp **convoy effect** (job dài làm chậm cả đoàn). ([GeeksforGeeks][1])
+* **Chỉ số & công thức** (viết bằng công thức hiển thị):
 
-# Hoặc thêm file cụ thể
-git add fcfs.py
+  * Turnaround (TAT) = CT − AT
+  * Waiting (WT) = TAT − BT
+  * Response = Start_first_run − AT ([Baeldung on Kotlin][2])
+* **Liên hệ so sánh** (để dùng ở phần Discussion):
 
-# Commit với message mô tả rõ ràng
-git commit -m "Mô tả ngắn gọn về thay đổi"
+  * **SJF/SRTF**: tối ưu **WT trung bình** về lý thuyết, nhưng có nguy cơ **starvation** nếu job ngắn đến liên tục. ([GeeksforGeeks][5])
+  * **RR**: quantum càng lớn **càng tiệm cận FCFS**; quantum quá nhỏ → nhiều context switch, nhưng đáp ứng tốt hệ tương tác. ([andrew.cmu.edu][6])
+* (Tham khảo nền tảng/metrics của OSTEP để trích dẫn chuẩn). ([UW Computer Sciences][7])
 
-# Push lên GitHub
-git push origin main
-```
+---
 
-### 3. Quy trình làm việc với Branch (Khuyên dùng)
+## 4) Thuật toán & Cài đặt (0.5–1 trang)
 
-Để tránh xung đột khi nhiều người cùng làm, mỗi người nên làm trên branch riêng:
+* Mô tả ngắn thuật toán FCFS bạn đã code:
+  Sắp theo **AT**, nếu rỗi thì chèn **IDLE**, rồi chạy theo thứ tự, tính **Start, CT, TAT, WT**; **không ngắt** giữa chừng (đây là đúng bản chất FCFS). ([GeeksforGeeks][1])
+* Sơ đồ luồng 5 bước: Nhập dữ liệu → Sắp theo AT → Mô phỏng theo thời gian → Tính CT/TAT/WT/Response → In bảng + Gantt.
 
-```powershell
-# Tạo branch mới cho tính năng của bạn
-git checkout -b feature/ten-tinh-nang
+---
 
-# Làm việc, commit như bình thường
-git add .
-git commit -m "Implement tính năng X"
+## 5) Thực nghiệm & Kết quả (1–2 trang)
 
-# Push branch lên GitHub
-git push origin feature/ten-tinh-nang
-```
+* **Dataset 1 – “normal”**
 
-Sau đó vào GitHub tạo Pull Request để các thành viên khác review trước khi merge.
+  * Chèn bảng: `normal.png` (CT/TAT/WT/Avg).
+  * Chèn Gantt: `Gantt_1.drawio.png`.
+  * Nhận xét 3–4 dòng: có **idle** 1–2; trình tự đúng AT; Avg TAT, WT thấp hơn kịch bản convoy.
+* **Dataset 2 – “convoy”**
 
-### 4. Giải quyết xung đột
+  * Chèn bảng: `convoy.png`.
+  * Chèn Gantt: `Gantt_2.drawio.png` (nhớ xóa dòng “P04” trùng khi xuất).
+  * Nhận xét 3–4 dòng: **P04 dài** (BT lớn) chạy sớm gây **convoy effect** → **Avg WT tăng mạnh**, đúng lý thuyết. ([GeeksforGeeks][3])
 
-Nếu gặp lỗi khi push (có người khác đã push trước):
-```powershell
-# Pull code mới nhất
-git pull origin main
+> Mẹo: kết thúc phần này bằng 1–2 câu tổng hợp số liệu (Avg TAT/WT) để bắc cầu sang Discussion.
 
-# Nếu có xung đột, Git sẽ báo
-# Mở file bị xung đột, tìm các dấu hiệu:
-# <<<<<<< HEAD
-# ... code của bạn ...
-# =======
-# ... code của người khác ...
-# >>>>>>> 
+---
 
-# Sửa file, giữ lại code đúng, xóa các dấu hiệu
-# Sau đó:
-git add .
-git commit -m "Resolve conflicts"
-git push origin main
-```
+## 6) Thảo luận (Discussion) (0.5–1 trang)
 
-## Quy tắc làm việc nhóm
+* **Vì sao xảy ra convoy** trong FCFS và khi nào đáng lo (workload có job dài, hệ tương tác). ([GeeksforGeeks][3])
+* **So sánh gọn** (đặt `BangSoSanh.drawio.png`):
 
-1. **LUÔN pull trước khi bắt đầu làm việc**
-2. **Commit thường xuyên** với message rõ ràng
-3. **Không commit file không cần thiết** (`.pyc`, `__pycache__/`, etc.)
-4. **Test code trước khi push**
-5. **Thông báo cho nhóm khi có thay đổi lớn**
+  * **SJF/SRTF**: giảm WT TB nhưng **starvation** có thể xảy ra, cần ước lượng BT. ([GeeksforGeeks][5])
+  * **RR**: cải thiện **responsiveness**; **quantum lớn ≈ FCFS**, nhỏ → nhiều context switch. ([andrew.cmu.edu][6])
+* **Giới hạn thực nghiệm**: dữ liệu toy, chưa đo context-switch overhead; chưa so sánh xác suất trên phân phối AT/BT.
 
-## Thành viên nhóm
-- TeoSushi1014 (Owner)
-- Vanphat111 (Collab)
-- [Thêm tên các thành viên khác]
+---
 
-## Liên hệ
-Nếu có vấn đề với Git/GitHub, hãy liên hệ trong nhóm hoặc tạo Issue trên GitHub.
+## 7) Kết luận & Hướng mở (5–7 dòng)
+
+* FCFS **đơn giản, dễ hiện thực**, minh họa convoy rõ ràng; kết quả **khớp lý thuyết và công thức**.
+* Hướng mở: mô phỏng thêm phân phối AT/BT, so sánh định lượng với RR/SRTF, đo thêm **Response time** để đánh giá hệ tương tác. ([UW Computer Sciences][7])
+
+---
